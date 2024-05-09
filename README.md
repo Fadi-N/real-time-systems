@@ -1,1 +1,1 @@
-# Modbus CRC
+# CAN CRC
