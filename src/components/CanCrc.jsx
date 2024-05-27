@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import InputField from "./InputField.jsx";
 import {FaCalculator} from "react-icons/fa";
 import InfoCard from "./InfoCard.jsx";
+import toast from "react-hot-toast";
 
 const CanCrc = () => {
     const [inputBin, setInputBin] = useState("");
@@ -13,7 +14,12 @@ const CanCrc = () => {
     })
 
     const handleBinChange = (e) => {
-        setInputBin(e.target.value);
+        const value = e.target.value.replace(/\s+/g, '');
+        if (value.length <= 96) {
+            setInputBin(value);
+        }else{
+            toast.error("ERROR!! Input exceeds the maximum allowed length of 96 bits.")
+        }
     };
 
     const calculateCRC = (data) => {
@@ -47,6 +53,11 @@ const bitStringToByteArray = (input) => {
     }
 
     const handleButtonClick = () => {
+        if (parseInt(iteration) < 1 || parseInt(iteration) > 1e9) {
+            toast.error("ERROR!! The number of iterations must be between 1 and 10^9.");
+            return;
+        }
+
         const start = performance.now();
         const byteArray = bitStringToByteArray(inputBin.replace(/\s+/g, ''));
         let totalCrc = 0;
@@ -64,7 +75,7 @@ const bitStringToByteArray = (input) => {
 
 
     return (
-        <div className="flex flex-col justify-center min-h-screen">
+        <div className="flex flex-col justify-center min-h-screen p-4">
             <InputField
                 label="Sequence of bytes in binary notation"
                 id="bytes_in_hex"
@@ -82,14 +93,14 @@ const bitStringToByteArray = (input) => {
             <div className="mt-4 flex justify-end">
                 <button
                     type="button"
-                    className="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2 flex flex-row justify-center items-center"
+                    className="flex-1 text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-full text-sm px-5 py-2.5 mb-2 flex flex-row justify-center items-center lg:float-end lg:flex-none"
                     onClick={handleButtonClick}
                 >
                     <FaCalculator/>
                     <span className="ml-2">Calculate</span>
                 </button>
             </div>
-            <div className="flex flex-row gap-12">
+            <div className="flex flex-col lg:flex-row lg:gap-12">
                 <InfoCard label="CRC (HEX)" value={crcResult.hex}/>
                 <InfoCard label="Total time" value={crcResult.totalTime}/>
                 <InfoCard label="Iteration time" value={crcResult.iterationTime}/>
