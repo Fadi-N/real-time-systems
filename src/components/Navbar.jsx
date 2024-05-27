@@ -10,9 +10,12 @@ const Navbar = () => {
 
     return (
         <nav className="py-6 px-4 lg:py-4 lg:px-16 shadow">
-            <div className="flex justify-between items-center text-sm lg:text-base">
-                <div className="text-base font-mono font-semibold lg:text-lg">
+            <div className="flex justify-between items-center">
+                <div className="hidden font-mono font-semibold lg:text-lg lg:block">
                     Real Time Systems
+                </div>
+                <div className="font-mono font-semibold text-2xl lg:hidden">
+                    RTS
                 </div>
                 <ul className="flex justify-center space-x-2 lg:space-x-6 lg:p-4">
                     {navItems.map(({to, label}) => (

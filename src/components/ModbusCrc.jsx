@@ -81,7 +81,7 @@ const ModbusCrc = () => {
 
 
     return (
-        <div className="flex flex-col justify-center p-4" style={{minHeight: 'calc(100vh - 88px)'}}>
+        <div className="flex flex-col justify-center p-4 form-container">
             <InputField
                 label="Sequence of bytes in the notation hexadecimal"
                 id="bytes_in_hex"

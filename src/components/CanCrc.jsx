@@ -75,7 +75,7 @@ const CanCrc = () => {
 
 
     return (
-        <div className="flex flex-col justify-center p-4" style={{minHeight: 'calc(100vh - 88px)'}}>
+        <div className="flex flex-col justify-center p-4 form-container">
             <InputField
                 label="Sequence of bytes in binary notation"
                 id="bytes_in_hex"
