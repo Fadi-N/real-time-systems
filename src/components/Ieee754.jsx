@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import {useState} from 'react';
 import InputField from "./InputField.jsx";
 import RadioOption from "./RadioOption.jsx";
-import { FaCalculator } from "react-icons/fa";
-import { Buffer } from 'buffer';
+import {FaCalculator} from "react-icons/fa";
+import {Buffer} from 'buffer';
 import ieee754 from 'ieee754';
 import InfoCard from "./InfoCard.jsx";
 
@@ -64,7 +64,7 @@ const Ieee754 = () => {
     };
 
     return (
-        <div className="flex flex-col justify-center min-h-screen p-4">
+        <div className="flex flex-col justify-center p-4" style={{minHeight: 'calc(100vh - 88px)'}}>
             <InputField
                 label="Bin/HEX"
                 id="bytes_in_hex"
@@ -98,7 +98,7 @@ const Ieee754 = () => {
                     <span className="ml-2">Calculate</span>
                 </button>
             </div>
-            <div className="flex flex-col lg:flex-row lg:gap-12">
+            <div className="flex flex-col lg:flex-row lg:gap-12 border-t-2 mt-6">
                 <InfoCard label="Output (Bin)" value={outputValue}/>
             </div>
         </div>

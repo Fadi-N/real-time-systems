@@ -1,5 +1,3 @@
-import React from 'react';
-
 const RadioOption = ({id, customClass, label, value, checked, onChange}) => {
     return (
         <div className={`flex flex-row ${customClass}`}>

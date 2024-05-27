@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import {useState} from 'react';
 import {aCRCHi, aCRCLo} from "../../constants/index.js";
 import InputField from "./InputField.jsx";
 import {FaCalculator} from "react-icons/fa";
@@ -81,7 +81,7 @@ const ModbusCrc = () => {
 
 
     return (
-        <div className="flex flex-col justify-center min-h-screen p-4">
+        <div className="flex flex-col justify-center p-4" style={{minHeight: 'calc(100vh - 88px)'}}>
             <InputField
                 label="Sequence of bytes in the notation hexadecimal"
                 id="bytes_in_hex"
@@ -106,7 +106,8 @@ const ModbusCrc = () => {
                     <span className="ml-2">Calculate</span>
                 </button>
             </div>
-            <div className="flex flex-col lg:flex-row lg:gap-12">
+
+            <div className="flex flex-col lg:flex-row lg:gap-12 border-t-2 mt-6">
                 <InfoCard label="CRC (HEX)" value={crcResult.hex}/>
                 <InfoCard label="Total time" value={crcResult.totalTime}/>
                 <InfoCard label="Iteration time" value={crcResult.iterationTime}/>
