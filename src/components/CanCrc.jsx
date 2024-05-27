@@ -17,7 +17,7 @@ const CanCrc = () => {
         const value = e.target.value.replace(/\s+/g, '');
         if (value.length <= 96) {
             setInputBin(value);
-        }else{
+        } else {
             toast.error("ERROR!! Input exceeds the maximum allowed length of 96 bits.")
         }
     };
@@ -37,7 +37,7 @@ const CanCrc = () => {
         return crc & 0x7FFF;
     }
 
-const bitStringToByteArray = (input) => {
+    const bitStringToByteArray = (input) => {
         const byteList = [];
         for (let i = input.length - 1; i >= 0; i -= 8) {
             let byteString = "";
