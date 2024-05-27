@@ -3,6 +3,7 @@ import {aCRCHi, aCRCLo} from "../../constants/index.js";
 import InputField from "./InputField.jsx";
 import {FaCalculator} from "react-icons/fa";
 import InfoCard from "./InfoCard.jsx";
+import toast from "react-hot-toast";
 
 const ModbusCrc = () => {
     const [inputHex, setInputHex] = useState("");
@@ -16,7 +17,11 @@ const ModbusCrc = () => {
     const handleHexChange = (e) => {
         const {value} = e.target;
         let formattedValue = value.replace(/\s+/g, '').replace(/(.{2})/g, '$1 ').trim();
-        setInputHex(formattedValue);
+        if (formattedValue.length / 3 <= 256) {
+            setInputHex(formattedValue);
+        } else {
+            toast.error("ERROR! The specified value exceeds 256 bytes.");
+        }
     };
 
     const hexStringToByteArray = (value) => {
@@ -47,7 +52,13 @@ const ModbusCrc = () => {
 
     const handleButtonClick = () => {
         const data = hexStringToByteArray(inputHex);
-        const iterations = parseInt(iteration) || 1;
+        const iterations = parseInt(iteration);
+
+        if (iterations < 1 || iterations > 1e9 || isNaN(iterations)) {
+            toast.error("ERROR!! The number of iterations must be between 1 and 10^9.");
+            return;
+        }
+
         const startTime = performance.now();
 
         let crc;
@@ -59,7 +70,7 @@ const ModbusCrc = () => {
         const totalTime = endTime - startTime;
         const iterationTime = totalTime / iterations;
 
-        console.log(totalTime, iterationTime)
+        //console.log(totalTime, iterationTime)
 
         setCrcResult({
             hex: crc.map(b => b.toString(16).padStart(2, '0')).join(' ').toUpperCase(),
@@ -70,7 +81,7 @@ const ModbusCrc = () => {
 
 
     return (
-        <div className="flex flex-col justify-center min-h-screen">
+        <div className="flex flex-col justify-center min-h-screen p-4">
             <InputField
                 label="Sequence of bytes in the notation hexadecimal"
                 id="bytes_in_hex"
@@ -85,17 +96,17 @@ const ModbusCrc = () => {
                 onChange={(e) => setIteration(e.target.value)}
                 placeholder="10"
             />
-            <div className="mt-4 flex justify-end">
+            <div className="mt-4 flex lg:justify-end">
                 <button
                     type="button"
-                    className="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2 flex flex-row justify-center items-center"
+                    className="flex-1 text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-full text-sm px-5 py-2.5 mb-2 flex flex-row justify-center items-center lg:float-end lg:flex-none"
                     onClick={handleButtonClick}
                 >
                     <FaCalculator/>
                     <span className="ml-2">Calculate</span>
                 </button>
             </div>
-            <div className="flex flex-row gap-12">
+            <div className="flex flex-col lg:flex-row lg:gap-12">
                 <InfoCard label="CRC (HEX)" value={crcResult.hex}/>
                 <InfoCard label="Total time" value={crcResult.totalTime}/>
                 <InfoCard label="Iteration time" value={crcResult.iterationTime}/>

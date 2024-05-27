@@ -64,7 +64,7 @@ const Ieee754 = () => {
     };
 
     return (
-        <div className="flex flex-col justify-center min-h-screen">
+        <div className="flex flex-col justify-center min-h-screen p-4">
             <InputField
                 label="Bin/HEX"
                 id="bytes_in_hex"
@@ -91,14 +91,14 @@ const Ieee754 = () => {
             <div className="mt-4 flex justify-end">
                 <button
                     type="button"
-                    className="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2 flex flex-row justify-center items-center"
+                    className="flex-1 text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-full text-sm px-5 py-2.5 mb-2 flex flex-row justify-center items-center lg:float-end lg:flex-none"
                     onClick={handleCalculate}
                 >
                     <FaCalculator/>
                     <span className="ml-2">Calculate</span>
                 </button>
             </div>
-            <div className="flex flex-row gap-12">
+            <div className="flex flex-col lg:flex-row lg:gap-12">
                 <InfoCard label="Output (Bin)" value={outputValue}/>
             </div>
         </div>
