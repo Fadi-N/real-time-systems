@@ -46,7 +46,7 @@ const ModbusCrc = () => {
     }
 
     const formatTime = (duration) => {
-        const milliseconds = duration / 1000000;
+        const milliseconds = duration / 1000;
         return `${milliseconds.toFixed(6)} ms`;
     }
 
