@@ -1,10 +1,11 @@
-import {useState} from 'react';
+import { useState } from 'react';
 import InputField from "./InputField.jsx";
 import RadioOption from "./RadioOption.jsx";
-import {FaCalculator} from "react-icons/fa";
-import {Buffer} from 'buffer';
+import { FaCalculator } from "react-icons/fa";
+import { Buffer } from 'buffer';
 import ieee754 from 'ieee754';
 import InfoCard from "./InfoCard.jsx";
+import { toast, Toaster } from 'react-hot-toast';
 
 const Ieee754 = () => {
     const [selectedValue, setSelectedValue] = useState('convertInternalToIEEE');
@@ -39,9 +40,9 @@ const Ieee754 = () => {
         return ieeeNumber.toString();
     };
 
-    const convertToInternal = (buffer) => {
-        const number = ieee754.read(buffer, 0, false, 23, 4);
-        ieee754.write(buffer, number, 0, false, 23, 4);
+    const convertToInternal = (floatValue) => {
+        const buffer = Buffer.alloc(4);
+        ieee754.write(buffer, parseFloat(floatValue), 0, false, 23, 4);
         return Array.from(buffer)
             .map(byte => byte.toString(2).padStart(8, '0'))
             .join('');
@@ -52,15 +53,22 @@ const Ieee754 = () => {
     };
 
     const handleCalculate = () => {
-        const buffer = parseInput(inputValue);
-        let result;
-        if (selectedValue === 'convertInternalToIEEE') {
-            result = convertToIEEE(buffer);
-        } else {
-            result = convertToInternal(buffer);
+        try {
+            if (selectedValue === 'convertInternalToIEEE') {
+                const buffer = parseInput(inputValue);
+                const result = convertToIEEE(buffer);
+                setOutputValue(result);
+            } else {
+                const floatValue = parseFloat(inputValue);
+                if (isNaN(floatValue) || !isFinite(floatValue)) {
+                    throw new Error('Invalid input format! Must be a valid float number.');
+                }
+                const result = convertToInternal(inputValue);
+                setOutputValue(formatBinary(result));
+            }
+        } catch (error) {
+            toast.error(error.message);
         }
-        const formattedResult = formatBinary(result);
-        setOutputValue(formattedResult);
     };
 
     return (
@@ -94,12 +102,12 @@ const Ieee754 = () => {
                     className="flex-1 text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-full text-sm px-5 py-2.5 mb-2 flex flex-row justify-center items-center lg:float-end lg:flex-none"
                     onClick={handleCalculate}
                 >
-                    <FaCalculator/>
+                    <FaCalculator />
                     <span className="ml-2">Calculate</span>
                 </button>
             </div>
             <div className="flex flex-col lg:flex-row lg:gap-12 border-t-2 mt-6">
-                <InfoCard label="Output (Bin)" value={outputValue}/>
+                <InfoCard label="Output (Bin)" value={outputValue} />
             </div>
         </div>
     );
