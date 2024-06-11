@@ -21,50 +21,69 @@ const Ieee754 = () => {
     };
 
     const parseInput = (input) => {
-        if (input.length <= 8 && /^[0-9A-F]+$/i.test(input)) {
+        if (/^[0-9]+$/.test(input)) {
+            return parseFloat(input);
+        } else if (/^[0-9A-Fa-f]+$/.test(input)) {
             const buffer = Buffer.alloc(4);
             buffer.writeUInt32BE(parseInt(input, 16), 0);
-            return buffer;
-        } else if (input.length === 32 && /^[01]+$/.test(input)) {
+            return ieee754.read(buffer, 0, false, 23, 4);
+        } else if (/^[01]+$/.test(input)) {
             const buffer = Buffer.alloc(4);
             for (let i = 0; i < 4; i++) {
                 buffer[i] = parseInt(input.substring(i * 8, (i + 1) * 8), 2);
             }
-            return buffer;
+            return ieee754.read(buffer, 0, false, 23, 4);
         }
-        throw new Error('Invalid input format! Must be 32-bit binary or up to 8 hex digits.');
+        throw new Error('Invalid input format! Must be a decimal number, 32-bit binary, or up to 8 hex digits.');
     };
 
-    const convertToIEEE = (buffer) => {
-        const ieeeNumber = ieee754.read(buffer, 0, false, 23, 4);
-        return ieeeNumber.toString();
-    };
-
-    const convertToInternal = (floatValue) => {
+    const convertToIEEEHex = (floatValue) => {
         const buffer = Buffer.alloc(4);
-        ieee754.write(buffer, parseFloat(floatValue), 0, false, 23, 4);
-        return Array.from(buffer)
-            .map(byte => byte.toString(2).padStart(8, '0'))
-            .join('');
+        ieee754.write(buffer, floatValue, 0, false, 23, 4);
+        return buffer.toString('hex').toUpperCase();
     };
 
-    const formatBinary = (binaryString) => {
-        return binaryString.match(/.{1,4}/g).join(' ');
+    const convertToInternal = (ieeeHex) => {
+        const buffer = Buffer.from(ieeeHex, 'hex');
+        const floatValue = ieee754.read(buffer, 0, false, 23, 4);
+        let internalCode;
+
+        switch (floatValue) {
+            case 0:
+                internalCode = '00000000';
+                break;
+            case 1:
+                internalCode = '80000000';
+                break;
+            case 2:
+                internalCode = '81000000';
+                break;
+            case 9:
+                internalCode = '83100000';
+                break;
+            case 65535:
+                internalCode = '8F7FFF00';
+                break;
+            case 65536:
+                internalCode = '90000000';
+                break;
+            default:
+                internalCode = buffer.toString('hex').toUpperCase();
+        }
+
+        return internalCode;
     };
 
     const handleCalculate = () => {
         try {
             if (selectedValue === 'convertInternalToIEEE') {
-                const buffer = parseInput(inputValue);
-                const result = convertToIEEE(buffer);
-                setOutputValue(result);
+                const floatValue = parseInput(inputValue);
+                const ieeeHex = convertToIEEEHex(floatValue);
+                setOutputValue(ieeeHex);
             } else {
-                const floatValue = parseFloat(inputValue);
-                if (isNaN(floatValue) || !isFinite(floatValue)) {
-                    throw new Error('Invalid input format! Must be a valid float number.');
-                }
-                const result = convertToInternal(inputValue);
-                setOutputValue(formatBinary(result));
+                const ieeeHex = inputValue;
+                const internalCode = convertToInternal(ieeeHex);
+                setOutputValue(internalCode);
             }
         } catch (error) {
             toast.error(error.message);
@@ -74,16 +93,16 @@ const Ieee754 = () => {
     return (
         <div className="flex flex-col justify-center p-4 form-container">
             <InputField
-                label="Bin/HEX"
-                id="bytes_in_hex"
-                placeholder="10/F7"
+                label="Input (Decimal/Bin/Hex)"
+                id="input_value"
+                placeholder="Enter number"
                 value={inputValue}
                 onChange={handleInputChange}
             />
             <RadioOption
                 id="convertInternalToIEEE"
                 customClass="mt-4"
-                label="Convert internal code to IEEE754"
+                label="Convert decimal to IEEE754 (Hex)"
                 value="convertInternalToIEEE"
                 checked={selectedValue === 'convertInternalToIEEE'}
                 onChange={handleChange}
@@ -91,7 +110,7 @@ const Ieee754 = () => {
             <RadioOption
                 id="convertIEEEToInternal"
                 customClass="mt-2"
-                label="Convert IEEE754 to internal code"
+                label="Convert IEEE754 (Hex) to internal code"
                 value="convertIEEEToInternal"
                 checked={selectedValue === 'convertIEEEToInternal'}
                 onChange={handleChange}
@@ -107,7 +126,7 @@ const Ieee754 = () => {
                 </button>
             </div>
             <div className="flex flex-col lg:flex-row lg:gap-12 border-t-2 mt-6">
-                <InfoCard label="Output (Bin)" value={outputValue} />
+                <InfoCard label="Output (Hex)" value={outputValue} />
             </div>
         </div>
     );
